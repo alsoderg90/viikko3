@@ -1,0 +1,19 @@
+{
+  "name": "viikko3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alsoderg90/viikko3.git"
+  },
+  "author": "Alexander Södergård",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alsoderg90/viikko3/issues"
+  },
+  "homepage": "https://github.com/alsoderg90/viikko3#readme"
+}
