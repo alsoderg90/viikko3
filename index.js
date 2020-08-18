@@ -2,6 +2,8 @@ const express= require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
+
 
 app.use(express.static('build'))
 app.use(cors())
@@ -11,6 +13,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :t
 morgan.token('type', function (req, res) { return JSON.stringify(req.body)
  }
 )
+
 
 let persons = [
 
@@ -37,6 +40,7 @@ let persons = [
         ]
 
 
+
   app.get('/info/',(request,response) => {
     
     response.send(`<p>Phonebook has info for ${persons.length} people<p>
@@ -45,7 +49,9 @@ let persons = [
 
 
   app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(person => {
+      response.json(person)
+    })
   })
   
   app.get('/api/persons/:id', (request, response) => {
