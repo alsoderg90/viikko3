@@ -1,3 +1,5 @@
-http://localhost:3001/api/persons
+https://thawing-lake-33788.herokuapp.com/api/persons
 
-http://localhost:3001/info
+https://thawing-lake-33788.herokuapp.com/info
+
+https://thawing-lake-33788.herokuapp.com/
