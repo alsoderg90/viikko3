@@ -1,7 +1,13 @@
 const express= require('express')
 const app = express()
+const morgan = require('morgan')
 
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :type'))
+
+morgan.token('type', function (req, res) { return JSON.stringify(req.body)
+ }
+)
 
 let persons = [
 
@@ -26,16 +32,20 @@ let persons = [
             id: 4
           }
         ]
-      
 
-app.get('/info/',(request,response) => {
+
+  app.get('/info/',(request,response) => {
     
     response.send(`<p>Phonebook has info for ${persons.length} people<p>
     <br>${Date()}`)
-})
+  })
 
-app.get('/', (req, res) => {
+  app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
+  })
+
+  app.get('/api/persons', (request, response) => {
+    response.json(persons)
   })
   
   app.get('/api/persons/:id', (request, response) => {
@@ -53,9 +63,15 @@ app.get('/', (req, res) => {
     }
   })
 
-  app.get('/api/persons', (request, response) => {
-      response.json(persons)
-  })
+const generateId = () => {
+  console.log(...persons.map(person => person.id))
+  const maxId = parseInt(1000*(Math.random()))
+  /*const maxId = persons.length > 0
+  ? Math.max(...persons.map(person => person.id))
+  :0*/
+  return maxId + 1
+}
+ 
 
   app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
@@ -66,26 +82,33 @@ app.get('/', (req, res) => {
     response.status(204).end()
 })
 
-  app.post('/api/persons', (request, response) => {
-    const body = request.body
-  
-    if (!body.content) {
-      return response.status(400).json({ 
-        error: 'content missing' 
-      })
-    }
-  
-    const note = {
-      content: body.content,
-      important: body.important || false,
-      date: new Date(),
-      id: generateId(),
-    }
-  
-    notes = notes.concat(note)
-  
-    response.json(note)
-  })
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: 'name or number missing'
+    })
+  }
+
+  const names = persons.map(person => person.name.toLowerCase())
+  console.log(names)
+
+  if (names.find(name => name === body.name)) {
+    return response.status(400).json({
+      error: `${body.name} is already added`
+    })
+  }
+
+  const person = {
+    name : body.name,
+    number: body.number,
+    id: generateId()
+  }
+
+  persons = persons.concat(person)
+  response.json(person)
+})
   
   const PORT = 3001
   app.listen(PORT, () => {
