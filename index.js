@@ -2,7 +2,9 @@ const express= require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+require('dotenv').config()
 const Person = require('./models/person')
+
 
 
 app.use(express.static('build'))
@@ -106,14 +108,14 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const person = {
+  const person = new Person({
     name : body.name,
     number: body.number,
-    id: generateId()
-  }
+  })
 
-  persons = persons.concat(person)
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
   
   const PORT = process.env.PORT || 3001
