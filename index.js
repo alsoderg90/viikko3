@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 require('dotenv').config()
 const Person = require('./models/person')
+const { Mongoose } = require('mongoose')
 
 
 app.use(express.static('build'))
@@ -111,9 +112,10 @@ app.delete('/api/persons/:id', (request, response) => {
   .catch(error => (next(error)))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
+  /*
   if (!body.name || !body.number) {
     return response.status(400).json({
       error: 'name or number missing'
@@ -127,7 +129,7 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({
       error: `${body.name} is already added`
     })
-  }
+  }*/
 
   const person = new Person({
     name : body.name,
@@ -135,9 +137,10 @@ app.post('/api/persons', (request, response) => {
   })
 
   person.save().then(savedPerson => {
-    response.json(savedPerson)
+    response.json(savedPerson.toJSON())
   })
-})
+  .catch(error => next(error))
+}) 
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
@@ -155,16 +158,18 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error,message)
+  console.error(error.message)
 
   if (error.name === 'CastError') {
     return response.status(400).send({error: 'malformatted id'})
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message})
   }
   next(error)
 }
 app.use(errorHandler)
   
-  const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
+  console.log(`Server running on port ${PORT}`)
+})
